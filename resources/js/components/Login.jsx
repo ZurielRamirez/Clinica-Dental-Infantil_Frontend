@@ -45,19 +45,46 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await api.post('/login', formData);
-      const { token, user } = response.data;
+      // 1. Enviamos solo email y password a la API de Laravel
+      const response = await api.post('/login', {
+        email: formData.email,
+        password: formData.password
+      });
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      // 2. Extraemos access_token y el objeto user devueltos por Zuriel
+      const { access_token, user } = response.data;
 
-      const role = user?.role || formData.role;
-      navigate(`/${role}/dashboard`);
+      // 3. Obtenemos el nombre del rol desde el arreglo 'roles' de Zuriel
+      const roleFromBackend = user?.roles?.[0]?.name || formData.role;
+
+      // Mapeamos 'dentist' a 'doctor' para tus rutas en React si es necesario
+      const normalizedRole = roleFromBackend === 'dentist' ? 'doctor' : roleFromBackend;
+
+      // 4. Guardamos un objeto user estructurado en el LocalStorage
+      const userToSave = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: normalizedRole
+      };
+
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('user', JSON.stringify(userToSave));
+
+      // 5. Redireccionamos al Dashboard según el rol
+      if (normalizedRole === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (normalizedRole === 'doctor' || roleFromBackend === 'dentist') {
+        navigate('/doctor/dashboard');
+      } else {
+        navigate('/tutor/dashboard');
+      }
+
     } catch (err) {
       if (err.response && err.response.status === 422) {
         setErrors(err.response.data.errors || {});
       } else {
-        setGeneralError('Credenciales incorrectas o error de conexión.');
+        setGeneralError(err.response?.data?.message || 'Credenciales incorrectas o error de conexión.');
       }
     } finally {
       setLoading(false);

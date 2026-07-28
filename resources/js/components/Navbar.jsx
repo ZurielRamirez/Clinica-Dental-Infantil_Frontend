@@ -25,7 +25,8 @@ const Navbar = () => {
   const getRoleLabel = (role) => {
     switch (role) {
       case 'admin': return 'Administración';
-      case 'doctor': return 'Especialista';
+      case 'doctor': 
+      case 'dentist': return 'Especialista';
       case 'tutor': return 'Padre / Tutor';
       default: return role;
     }
@@ -48,10 +49,16 @@ const Navbar = () => {
     navigate('/login', { replace: true });
   };
 
+  // Redirección al Dashboard según el Rol al hacer clic en el Logo
+  const handleBrandClick = () => {
+    const role = user.role === 'dentist' ? 'doctor' : user.role;
+    navigate(`/${role || 'tutor'}/dashboard`);
+  };
+
   return (
     <header className="navbar-custom">
-      {/* Brand / Logo Oficial */}
-      <div className="navbar-brand">
+      {/* Brand / Logo Oficial (Click para ir a su Dashboard) */}
+      <div className="navbar-brand" onClick={handleBrandClick} style={{ cursor: 'pointer' }}>
         <img 
           src="/logo.png" 
           alt="Logo Clínica Dental Infantil" 
@@ -79,7 +86,6 @@ const Navbar = () => {
         {/* Tarjeta Ejecutiva Desplegable */}
         {dropdownOpen && (
           <div className="profile-dropdown">
-            {/* Header del Menú */}
             <div className="dropdown-header-card">
               <div className="dropdown-avatar-large">
                 {getInitials(user.name)}
@@ -93,7 +99,6 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Opciones (Solo Mi Perfil y Cerrar Sesión) */}
             <div className="dropdown-body">
               <button 
                 onClick={() => {

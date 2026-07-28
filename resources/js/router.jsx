@@ -12,23 +12,6 @@ import Register from './components/Register';
 // Vista de Perfil
 import Profile from './components/Profile';
 
-// Vistas Temporales de Dashboards
-const AdminDashboard = () => (
-  <div className="p-6 bg-white rounded-lg shadow-sm border border-emerald-100">
-    <h1 className="text-2xl font-bold text-emerald-800">Panel de Control General (Administración)</h1>
-    <p className="text-gray-600 mt-2">Bienvenido al sistema de administración de la Clínica Dental Infantil.</p>
-  </div>
-);
-
-const DoctorDashboard = () => (
-  <div className="p-6 bg-white rounded-lg shadow-sm border border-emerald-100">
-    <h1 className="text-2xl font-bold text-emerald-800">Módulo Odontopediatría</h1>
-    <p className="text-gray-600 mt-2">Aquí gestionarás las consultas, diagnósticos e historias clínicas.</p>
-  </div>
-);
-
-const TutorDashboard = () => <PatientsManager />;
-
 const NotFound = () => <div className="p-8 text-center text-red-600 font-bold">404 - Página No Encontrada</div>;
 
 const AppRouter = () => {
@@ -39,28 +22,29 @@ const AppRouter = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Rutas Protegidas dentro del MainLayout (Navbar Persistente) */}
+        {/* Rutas Protegidas dentro del MainLayout */}
         <Route element={<MainLayout />}>
           
-          {/* Ruta de Perfil común (Accesible para cualquier usuario autenticado) */}
+          {/* Ruta de Perfil común */}
           <Route element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'tutor']} />}>
             <Route path="/profile" element={<Profile />} />
           </Route>
 
-          {/* Rutas con Control de Acceso Por Rol: ADMIN */}
+          {/* Rutas ADMIN: Ahora la raíz del dashboard carga la tabla de usuarios */}
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminUsersManager />} />
             <Route path="/admin/users" element={<AdminUsersManager />} />
           </Route>
 
-          {/* Rutas con Control de Acceso Por Rol: DOCTOR */}
-          <Route element={<ProtectedRoute allowedRoles={['doctor']} />}>
-            <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          {/* Rutas DOCTOR / DENTIST: Carga la gestión de pacientes y expedientes */}
+          <Route element={<ProtectedRoute allowedRoles={['doctor', 'dentist']} />}>
+            <Route path="/doctor/dashboard" element={<PatientsManager />} />
+            <Route path="/doctor/patients" element={<PatientsManager />} />
           </Route>
 
-          {/* Rutas con Control de Acceso Por Rol: TUTOR */}
+          {/* Rutas TUTOR: Carga la gestión de pacientes (tarjetas de sus hijos) */}
           <Route element={<ProtectedRoute allowedRoles={['tutor']} />}>
-            <Route path="/tutor/dashboard" element={<TutorDashboard />} />
+            <Route path="/tutor/dashboard" element={<PatientsManager />} />
           </Route>
         </Route>
 
