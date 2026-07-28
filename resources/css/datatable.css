@@ -1,0 +1,121 @@
+/* ==========================================
+   TABLAS SERVER-SIDE - KIDDIEDENT (Paso 8)
+   ========================================== */
+
+.table-wrapper {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #E2F5EE;
+  box-shadow: 0 4px 12px rgba(11, 91, 66, 0.03);
+  overflow: hidden;
+}
+
+/* Filtros y Búsqueda Header */
+.table-filter-bar {
+  padding: 16px 20px;
+  background-color: #FAFCFB;
+  border-bottom: 1px solid #E2F5EE;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.search-input-wrapper input {
+  width: 100%;
+  padding: 9px 12px 9px 36px;
+  border-radius: 8px;
+  border: 1.5px solid #D1D5DB;
+  font-size: 0.88rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-input-wrapper input:focus {
+  border-color: #0B5B42;
+  box-shadow: 0 0 0 3px rgba(11, 91, 66, 0.12);
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9CA3AF;
+  font-size: 0.9rem;
+}
+
+/* Tabla de Datos */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.custom-table th {
+  background-color: #F3FAF7;
+  color: #0B5B42;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #E2F5EE;
+}
+
+.custom-table td {
+  padding: 14px 18px;
+  font-size: 0.88rem;
+  color: #374151;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.custom-table tbody tr:hover {
+  background-color: #F9FCFB;
+}
+
+/* Paginación Footer Server-Side */
+.table-pagination-footer {
+  padding: 14px 20px;
+  background-color: #FAFCFB;
+  border-top: 1px solid #E2F5EE;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pagination-btn {
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #D1D5DB;
+  background: #ffffff;
+  color: #374151;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #0B5B42;
+  color: #0B5B42;
+  background-color: #E2F5EE;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  font-size: 0.82rem;
+  color: #6B7280;
+  font-weight: 500;
+}

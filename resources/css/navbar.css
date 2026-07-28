@@ -1,0 +1,242 @@
+
+.navbar-custom {
+  background-color: #ffffff;
+  border-bottom: 2px solid #E2F5EE;
+  padding: 12px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(11, 91, 66, 0.05);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  color: #0B5B42;
+  font-size: 1.15rem;
+}
+
+.navbar-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.user-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1F2937;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #187A5E;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #0B5B42;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-logout {
+  background-color: #FEF2F2;
+  color: #EF4444;
+  border: 1px solid #FCA5A5;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin-left: 6px;
+}
+
+.btn-logout:hover {
+  background-color: #EF4444;
+  color: #ffffff;
+  border-color: #EF4444;
+}
+
+/* Gatillo del Menú de Perfil */
+.user-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.user-profile-trigger:hover {
+  background-color: #F0FDF4;
+  border-color: #E2F5EE;
+}
+
+/* Contenedor Flotante del Dropdown */
+.profile-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 260px;
+  background-color: #ffffff;
+  border: 1px solid #E2F5EE;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(11, 91, 66, 0.12);
+  padding: 0;
+  z-index: 100;
+  overflow: hidden;
+  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Cabecera del Perfil */
+.dropdown-header-card {
+  background: linear-gradient(135deg, #F0FDF4 0%, #E2F5EE 100%);
+  padding: 16px;
+  border-bottom: 1px solid #E2F5EE;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dropdown-avatar-large {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background-color: #0B5B42;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: 0 2px 6px rgba(11, 91, 66, 0.2);
+  flex-shrink: 0;
+}
+
+.dropdown-user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.dropdown-user-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #0B5B42;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-user-email {
+  font-size: 0.75rem;
+  color: #4B5563;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Insignias / Badges de Roles */
+.role-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: fit-content;
+}
+
+.role-badge.tutor {
+  background-color: #DBEAFE;
+  color: #1E40AF;
+}
+
+.role-badge.doctor {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.role-badge.admin {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+/* Opciones del Menú */
+.dropdown-body {
+  padding: 8px;
+}
+
+.dropdown-item-btn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: #374151;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdown-item-btn:hover {
+  background-color: #F0FDF4;
+  color: #0B5B42;
+}
+
+.dropdown-item-btn svg {
+  stroke-width: 2;
+  width: 18px;
+  height: 18px;
+}
+
+.dropdown-divider-line {
+  height: 1px;
+  background-color: #F3F4F6;
+  margin: 6px 0;
+}
+
+.logout-btn-item {
+  color: #EF4444;
+}
+
+.logout-btn-item:hover {
+  background-color: #FEF2F2;
+  color: #DC2626;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

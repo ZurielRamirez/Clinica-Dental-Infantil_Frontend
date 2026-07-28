@@ -1,0 +1,85 @@
+/* ==========================================
+   GESTIÓN DE PACIENTES - KIDDIEDENT (Paso 7)
+   ========================================== */
+
+.patients-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Formulario & Campos con Validación */
+.form-group-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-label-custom {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0B5B42;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-custom {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #D1D5DB;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: #FFFFFF;
+}
+
+.input-custom:focus {
+  border-color: #0B5B42;
+  box-shadow: 0 0 0 3px rgba(11, 91, 66, 0.15);
+}
+
+/* Estados de Validación en Tiempo Real */
+.input-custom.is-invalid {
+  border-color: #EF4444 !important;
+  background-color: #FEF2F2;
+}
+
+.input-custom.is-valid {
+  border-color: #10B981 !important;
+  background-color: #F0FDF4;
+}
+
+.error-feedback {
+  font-size: 0.75rem;
+  color: #EF4444;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Tarjetas de Pacientes */
+.patient-card {
+  background: #ffffff;
+  border: 1px solid #E2F5EE;
+  border-radius: 14px;
+  padding: 18px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(11, 91, 66, 0.03);
+}
+
+.patient-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(11, 91, 66, 0.08);
+  border-color: #0B5B42;
+}
+
+.badge-age {
+  background-color: #E2F5EE;
+  color: #0B5B42;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
