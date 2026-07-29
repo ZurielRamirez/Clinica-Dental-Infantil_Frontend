@@ -13,6 +13,7 @@ const ServerSideTable = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterValue, setFilterValue] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
   
   // Estado de Paginación desde la API de Laravel
   const [pagination, setPagination] = useState({
@@ -26,7 +27,7 @@ const ServerSideTable = ({
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm);
-      setPagination((prev) => ({ ...prev, currentPage: 1 })); // Reset a página 1 al buscar
+      setPagination((prev) => ({ ...prev, currentPage: 1 }));
     }, 400);
 
     return () => clearTimeout(handler);
@@ -34,11 +35,14 @@ const ServerSideTable = ({
 
   // Función principal para consultar la API
   const fetchData = useCallback(async () => {
+    if (!fetchUrl) return;
+
     setLoading(true);
+    setErrorMessage(null);
+
     try {
       const token = localStorage.getItem('token');
       
-      // Construcción de parámetros URL para paginación Server-Side
       const queryParams = new URLSearchParams({
         page: pagination.currentPage,
         search: debouncedSearch,
@@ -46,30 +50,52 @@ const ServerSideTable = ({
       });
 
       const response = await fetch(`${fetchUrl}?${queryParams.toString()}`, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
       });
 
+      // Validar si la respuesta es explícitamente JSON antes de consumir el body
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error(`El servidor no respondió JSON (Status ${response.status}). Respuesta:`, text.slice(0, 150));
+        throw new Error(`Respuesta no válida del servidor (${response.status}). Verifica el endpoint: ${fetchUrl}`);
+      }
+
+      const result = await response.json();
+
       if (response.ok) {
-        const result = await response.json();
-        // Asumiendo respuesta paginada nativa de Laravel (LengthAwarePaginator)
-        setData(result.data || result);
-        if (result.meta || result.current_page) {
+        // Manejo flexible de respuesta Laravel (Paginada o Lista simple)
+        const items = result.data ? result.data : (Array.isArray(result) ? result : []);
+        setData(items);
+
+        // Estructura de Paginador de Laravel
+        if (result.current_page || (result.meta && result.meta.current_page)) {
           setPagination({
             currentPage: result.current_page || result.meta.current_page,
             lastPage: result.last_page || result.meta.last_page,
             total: result.total || result.meta.total,
             perPage: result.per_page || result.meta.per_page
           });
+        } else {
+          setPagination({
+            currentPage: 1,
+            lastPage: 1,
+            total: items.length,
+            perPage: items.length || 10
+          });
         }
       } else {
-        // Fallback/Simulación visual si el backend aún no implementa el filtro
-        console.warn('API Endpoint respondió no OK. Mostrando estado limpio.');
+        throw new Error(result.message || `Error ${response.status}: No se pudieron obtener los datos.`);
       }
     } catch (error) {
       console.error('Error al obtener datos paginados:', error);
+      setErrorMessage(error.message);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -130,6 +156,12 @@ const ServerSideTable = ({
               <tr>
                 <td colSpan={columns.length + (renderActions ? 1 : 0)} className="text-center py-8 text-emerald-800 font-medium">
                   ⏳ Cargando datos desde el servidor...
+                </td>
+              </tr>
+            ) : errorMessage ? (
+              <tr>
+                <td colSpan={columns.length + (renderActions ? 1 : 0)} className="text-center py-8 text-red-600 bg-red-50 font-medium">
+                  ⚠️ {errorMessage}
                 </td>
               </tr>
             ) : data.length === 0 ? (

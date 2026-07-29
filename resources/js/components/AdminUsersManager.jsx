@@ -3,46 +3,71 @@ import ServerSideTable from './ServerSideTable';
 
 const AdminUsersManager = () => {
   const columns = [
-    { header: 'ID', accessor: 'id' },
-    { 
-      header: 'Nombre', 
-      accessor: 'name',
-      render: (row) => <span className="font-bold text-gray-800">{row.name}</span>
+    {
+      header: 'Usuario',
+      accessorKey: 'name',
+      cell: (row) => (
+        <div className="flex items-center gap-3 font-bold text-slate-800">
+          <div className="w-8 h-8 rounded-full bg-emerald-100 text-[#0B5B42] font-black flex items-center justify-center text-xs border border-emerald-200">
+            {row.name ? row.name.charAt(0).toUpperCase() : 'A'}
+          </div>
+          <span>{row.name || 'Usuario'}</span>
+        </div>
+      ),
     },
-    { header: 'Correo Electrónico', accessor: 'email' },
+    {
+      header: 'Correo Electrónico',
+      accessorKey: 'email',
+    },
     {
       header: 'Rol',
-      accessor: 'role',
-      render: (row) => (
-        <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${
-          row.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-          row.role === 'doctor' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'
-        }`}>
-          {row.role ? row.role.toUpperCase() : 'TUTOR'}
+      accessorKey: 'role',
+      cell: (row) => (
+        <span className="capitalize bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-md text-[10px] font-bold">
+          {row.role || 'Usuario'}
         </span>
-      )
-    }
-  ];
-
-  const roleFilters = [
-    { label: 'Administradores', value: 'admin' },
-    { label: 'Doctores / Especialistas', value: 'doctor' },
-    { label: 'Padres / Tutores', value: 'tutor' }
+      ),
+    },
+    {
+      header: 'Acciones',
+      id: 'actions',
+      cell: (row) => (
+        <div className="text-right">
+          <button
+            onClick={() => alert(`Editar usuario ID: ${row.id}`)}
+            className="text-[#0B5B42] font-bold hover:underline text-xs"
+          >
+            Editar
+          </button>
+        </div>
+      ),
+    },
   ];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="bg-white p-6 rounded-xl border border-emerald-100 shadow-sm">
-        <h1 className="text-2xl font-bold text-emerald-900">Gestión de Usuarios del Sistema</h1>
-        <p className="text-sm text-gray-600 mt-1">Tabla conectada a API REST de Laravel con búsqueda y paginación server-side.</p>
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-2xl">👥</span>
+            <h2 className="text-xl font-bold text-slate-800">Gestión de Usuarios</h2>
+          </div>
+          <p className="text-xs text-slate-500">
+            Administra los roles, accesos y permisos de doctores, tutores y administradores.
+          </p>
+        </div>
+        <button className="px-4 py-2.5 bg-[#0B5B42] hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+          <span>+</span> Registrar Nuevo Usuario
+        </button>
       </div>
 
-      <ServerSideTable
-        columns={columns}
-        fetchUrl="/api/users"
-        filterOptions={roleFilters}
-        placeholderSearch="Buscar por nombre o correo..."
-      />
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <ServerSideTable
+          endpoint="/api/users"
+          columns={columns}
+          placeholderSearch="Buscar por nombre o correo..."
+        />
+      </div>
     </div>
   );
 };
