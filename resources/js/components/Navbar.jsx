@@ -1,42 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../../css/navbar.css';
+import { Link, useNavigate } from 'react-router-dom';
+import ContactClinicModal from './ContactClinicModal'; // <-- Importamos el nuevo modal
 
-const Navbar = () => {
-  const navigate = useNavigate();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+const Navbar = ({ user, isMobileOpen, setIsMobileOpen }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false); // <-- Estado para el modal de contacto
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
-  // Cargar usuario desde LocalStorage
-  const storedUser = localStorage.getItem('user');
-  const user = storedUser ? JSON.parse(storedUser) : { name: 'Usuario Registrado', role: 'tutor', email: 'usuario@kiddiedent.com' };
-
-  // Helper para iniciales
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    const parts = name.trim().split(' ');
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return name.slice(0, 2).toUpperCase();
-  };
-
-  // Formatear etiquetas de rol
-  const getRoleLabel = (role) => {
-    switch (role) {
-      case 'admin': return 'Administración';
-      case 'doctor': 
-      case 'dentist': return 'Especialista';
-      case 'tutor': return 'Padre / Tutor';
-      default: return role;
-    }
-  };
-
-  // Cierre al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
+        setIsDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -49,83 +24,122 @@ const Navbar = () => {
     navigate('/login', { replace: true });
   };
 
-  // Redirección al Dashboard según el Rol al hacer clic en el Logo
-  const handleBrandClick = () => {
-    const role = user.role === 'dentist' ? 'doctor' : user.role;
-    navigate(`/${role || 'tutor'}/dashboard`);
-  };
-
   return (
-    <header className="navbar-custom">
-      {/* Brand / Logo Oficial (Click para ir a su Dashboard) */}
-      <div className="navbar-brand" onClick={handleBrandClick} style={{ cursor: 'pointer' }}>
-        <img 
-          src="/logo.png" 
-          alt="Logo Clínica Dental Infantil" 
-          style={{ width: '32px', height: '32px', objectFit: 'contain' }} 
-        />
-        <span>Clínica Dental Infantil</span>
-      </div>
-
-      {/* Perfil & Menú Desplegable */}
-      <div className="navbar-user-menu" ref={dropdownRef}>
-        <div 
-          className="user-profile-trigger" 
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-        >
-          <div className="user-info">
-            <span className="user-name">{user.name}</span>
-            <span className="user-role">{getRoleLabel(user.role)}</span>
-          </div>
-
-          <div className="user-avatar">
-            {getInitials(user.name)}
-          </div>
+    <>
+      <header className="bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between shadow-sm sticky top-0 z-30">
+        
+        {/* Título de la Clínica */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsMobileOpen(!isMobileOpen)}
+            className="md:hidden text-slate-600 hover:text-slate-900 font-bold p-1 cursor-pointer"
+          >
+            ☰
+          </button>
+          <span className="text-xs font-black text-slate-700 uppercase tracking-wider hidden sm:inline-block">
+            CLÍNICA DE ODONTOPEDIATRÍA
+          </span>
         </div>
 
-        {/* Tarjeta Ejecutiva Desplegable */}
-        {dropdownOpen && (
-          <div className="profile-dropdown">
-            <div className="dropdown-header-card">
-              <div className="dropdown-avatar-large">
-                {getInitials(user.name)}
+        {/* Acciones de Contacto del Cliente + Rol + Perfil */}
+        <div className="flex items-center gap-3">
+          
+          {/* Botón rápido para que el Tutor/Cliente contacte a la clínica */}
+          <button
+            type="button"
+            onClick={() => setIsContactOpen(true)}
+            className="hidden sm:flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-[#0B5B42] border border-emerald-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition cursor-pointer shadow-2xs"
+            title="Contactar con la clínica por WhatsApp o Correo"
+          >
+            <span>💬</span>
+            <span>Ayuda / Contacto</span>
+          </button>
+
+          {/* Badge de Rol */}
+          <span className="px-3 py-1 text-[11px] font-bold rounded-full bg-emerald-100 text-[#0B5B42] uppercase tracking-wide">
+            {user?.role || 'TUTOR'}
+          </span>
+
+          {/* Avatar y Menú de Usuario */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-100 transition cursor-pointer focus:outline-none"
+            >
+              <div className="w-8 h-8 rounded-full bg-[#0B5B42] text-white font-bold flex items-center justify-center text-xs shadow-sm">
+                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
               </div>
-              <div className="dropdown-user-details">
-                <p className="dropdown-user-name" title={user.name}>{user.name}</p>
-                <p className="dropdown-user-email" title={user.email}>{user.email || 'correo@kiddiedent.com'}</p>
-                <span className={`role-badge ${user.role}`}>
-                  {getRoleLabel(user.role)}
-                </span>
+
+              <div className="text-left hidden sm:block">
+                <p className="text-xs font-bold text-slate-800 leading-none">
+                  {user?.name || 'Usuario'}
+                </p>
+                <p className="text-[10px] text-slate-400 leading-tight mt-0.5">
+                  Ver opciones
+                </p>
               </div>
-            </div>
 
-            <div className="dropdown-body">
-              <button 
-                onClick={() => {
-                  setDropdownOpen(false);
-                  navigate('/profile');
-                }} 
-                className="dropdown-item-btn"
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                Mi Perfil
-              </button>
+              <span className="text-slate-400 text-[10px] ml-0.5">
+                {isDropdownOpen ? '▲' : '▼'}
+              </span>
+            </button>
 
-              <div className="dropdown-divider-line"></div>
+            {/* Dropdown */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50">
+                <div className="px-4 py-3 border-b border-slate-100 space-y-1">
+                  <p className="text-xs font-bold text-slate-800 truncate">{user?.name}</p>
+                  <p className="text-[11px] text-slate-500 flex items-center gap-1.5 truncate">
+                    <span>✉️</span>
+                    <span>{user?.email || 'Sin correo registrado'}</span>
+                  </p>
+                </div>
 
-              <button onClick={handleLogout} className="dropdown-item-btn logout-btn-item">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                Cerrar Sesión
-              </button>
-            </div>
+                {/* Opción de contacto dentro del menú también */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    setIsContactOpen(true);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-xs text-emerald-800 hover:bg-emerald-50 font-bold flex items-center gap-2 transition cursor-pointer"
+                >
+                  <span>💬</span>
+                  <span>Soporte por WhatsApp / Correo</span>
+                </button>
+
+                <Link
+                  to="/profile"
+                  onClick={() => setIsDropdownOpen(false)}
+                  className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-emerald-50 hover:text-[#0B5B42] font-semibold flex items-center gap-2 transition"
+                >
+                  <span>👤</span>
+                  <span>Mi Perfil</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 font-semibold flex items-center gap-2 transition cursor-pointer border-t border-slate-100 mt-1"
+                >
+                  <span>🚪</span>
+                  <span>Cerrar Sesión</span>
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    </header>
+
+        </div>
+      </header>
+
+      {/* Modal de Contacto para el Cliente */}
+      <ContactClinicModal
+        isOpen={isContactOpen}
+        onClose={() => setIsContactOpen(false)}
+      />
+    </>
   );
 };
 
