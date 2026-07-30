@@ -1,37 +1,29 @@
 import React from 'react';
-import ServerSideTable from './ServerSideTable';
+import ServerSideTable from '../components/ServerSideTable'; // O la ruta correspondiente a tu tabla
 
 const PatientsManager = () => {
+  // Configuración de columnas sincronizada con los atributos del Backend
   const columns = [
     {
       header: 'Paciente / Hijo',
-      accessorKey: 'name',
+      accessorKey: 'first_name',
       cell: (row) => (
         <div className="flex items-center gap-3 font-bold text-slate-800">
           <div className="w-8 h-8 rounded-full bg-emerald-100 text-[#0B5B42] font-bold flex items-center justify-center text-xs">
             👶
           </div>
           <div>
-            <p className="font-bold">{row.name}</p>
-            <p className="text-[10px] text-slate-400">Nacimiento: {row.birthdate || '2019-05-12'}</p>
+            <p className="font-bold">{row.first_name} {row.last_name}</p>
+            <p className="text-[10px] text-slate-400">Nacimiento: {row.birth_date}</p>
           </div>
         </div>
-      ),
-    },
-    {
-      header: 'Edad',
-      accessorKey: 'age',
-      cell: (row) => (
-        <span className="bg-slate-100 px-2 py-1 rounded text-xs font-semibold text-slate-700">
-          {row.age || '7'} años
-        </span>
       ),
     },
     {
       header: 'Alergias',
       accessorKey: 'allergies',
       cell: (row) => (
-        <span className={row.allergies ? 'text-red-600 font-bold' : 'text-slate-500'}>
+        <span className={row.allergies && row.allergies !== 'Ninguna' ? 'text-red-600 font-bold' : 'text-slate-500'}>
           {row.allergies || 'Ninguna'}
         </span>
       ),
@@ -50,24 +42,19 @@ const PatientsManager = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="p-6">
+      <div className="mb-6 flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Gestión de Pacientes / Hijos</h2>
-          <p className="text-xs text-slate-500">Registra y administra las fichas pediátricas de los pacientes.</p>
+          <h1 className="text-2xl font-bold text-[#004D40]">Mis Pacientes Registrados</h1>
+          <p className="text-sm text-slate-500">Consulta la lista y ficha clínica de tus hijos/tutelados.</p>
         </div>
-        <button className="px-4 py-2.5 bg-[#0B5B42] text-white font-bold text-xs rounded-xl shadow-md transition">
-          + Registrar Nuevo Paciente
-        </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <ServerSideTable
-          endpoint="/api/tutor/patients"
-          columns={columns}
-          placeholderSearch="Buscar paciente o alergia..."
-        />
-      </div>
+      {/* Endpoint corregido a /patients */}
+      <ServerSideTable
+        endpoint="/patients"
+        columns={columns}
+      />
     </div>
   );
 };
