@@ -1,8 +1,22 @@
-import React from 'react';
-import ServerSideTable from '../components/ServerSideTable'; // Ajusta la ruta a tu componente de tabla
+import React, { useState } from 'react';
+import api from '../api/axios';
+import ServerSideTable from '../components/ServerSideTable';
 
 const AdminUsersManager = () => {
-  // Configuración de columnas adaptada a la respuesta de la API
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [confirmToggle, setConfirmToggle] = useState(null);
+
+  const handleToggleActive = async (user) => {
+    try {
+      await api.patch(`/users/${user.id}/toggle-active`);
+      setRefreshKey(prev => prev + 1);
+    } catch (err) {
+      alert(err.response?.data?.message || 'No se pudo actualizar el estado del usuario.');
+    } finally {
+      setConfirmToggle(null);
+    }
+  };
+
   const columns = [
     {
       header: 'Usuario',
@@ -28,7 +42,6 @@ const AdminUsersManager = () => {
         </span>
       ),
     },
-    // 2. Columna de Rol mapeando el array 'roles'
     {
       header: 'Rol',
       accessorKey: 'roles',
@@ -38,17 +51,25 @@ const AdminUsersManager = () => {
         </span>
       ),
     },
-    // 3. Columna de Acciones sin usar alert() nativo
+    {
+      header: 'Estado',
+      accessorKey: 'active',
+      cell: (row) => (
+        <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${row.active ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+          {row.active ? 'Activo' : 'Desactivado'}
+        </span>
+      ),
+    },
     {
       header: 'Acciones',
       id: 'actions',
       cell: (row) => (
         <div className="text-right">
           <button
-            onClick={() => console.log('Editar usuario ID:', row.id)}
-            className="text-[#0B5B42] font-bold hover:underline text-xs"
+            onClick={() => setConfirmToggle(row)}
+            className={`font-bold hover:underline text-xs ${row.active ? 'text-red-600' : 'text-emerald-700'}`}
           >
-            Editar
+            {row.active ? 'Desactivar' : 'Activar'}
           </button>
         </div>
       ),
@@ -64,13 +85,47 @@ const AdminUsersManager = () => {
         </div>
       </div>
 
-      {/* 1. Endpoint corregido a /users */}
       <ServerSideTable
+        key={refreshKey}
         endpoint="/users"
         columns={columns}
       />
+
+      {confirmToggle && (
+        <ConfirmToggleModal
+          user={confirmToggle}
+          onCancel={() => setConfirmToggle(null)}
+          onConfirm={() => handleToggleActive(confirmToggle)}
+        />
+      )}
     </div>
   );
 };
+
+function ConfirmToggleModal({ user, onCancel, onConfirm }) {
+  const activar = !user.active;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+      <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 space-y-4">
+        <h3 className="text-base font-bold text-slate-800">
+          {activar ? 'Activar cuenta' : 'Desactivar cuenta'}
+        </h3>
+        <p className="text-sm text-slate-600">
+          ¿Seguro que quieres {activar ? 'activar' : 'desactivar'} la cuenta de <strong>{user.name}</strong>?
+          {!activar && ' No podrá iniciar sesión mientras esté desactivada.'}
+        </p>
+        <div className="flex justify-end gap-3">
+          <button onClick={onCancel} className="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl cursor-pointer">Cancelar</button>
+          <button
+            onClick={onConfirm}
+            className={`px-4 py-2 text-white text-xs font-bold rounded-xl cursor-pointer ${activar ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-red-600 hover:bg-red-700'}`}
+          >
+            Sí, {activar ? 'activar' : 'desactivar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default AdminUsersManager;
