@@ -1,40 +1,51 @@
 import React from 'react';
-import ServerSideTable from './ServerSideTable';
+import ServerSideTable from '../components/ServerSideTable'; // Ajusta la ruta a tu componente de tabla
 
 const AdminUsersManager = () => {
+  // Configuración de columnas adaptada a la respuesta de la API
   const columns = [
     {
       header: 'Usuario',
       accessorKey: 'name',
       cell: (row) => (
-        <div className="flex items-center gap-3 font-bold text-slate-800">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 text-[#0B5B42] font-black flex items-center justify-center text-xs border border-emerald-200">
-            {row.name ? row.name.charAt(0).toUpperCase() : 'A'}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-emerald-100 text-[#0B5B42] font-bold flex items-center justify-center text-xs">
+            👤
           </div>
-          <span>{row.name || 'Usuario'}</span>
+          <div>
+            <p className="font-bold text-slate-800">{row.name}</p>
+            <p className="text-[11px] text-slate-400">{row.email}</p>
+          </div>
         </div>
       ),
     },
     {
-      header: 'Correo Electrónico',
-      accessorKey: 'email',
-    },
-    {
-      header: 'Rol',
-      accessorKey: 'role',
+      header: 'Teléfono',
+      accessorKey: 'phone',
       cell: (row) => (
-        <span className="capitalize bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-md text-[10px] font-bold">
-          {row.role || 'Usuario'}
+        <span className="text-slate-600 text-xs font-medium">
+          {row.phone || 'N/A'}
         </span>
       ),
     },
+    // 2. Columna de Rol mapeando el array 'roles'
+    {
+      header: 'Rol',
+      accessorKey: 'roles',
+      cell: (row) => (
+        <span className="capitalize bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-md text-[10px] font-bold">
+          {row.roles && row.roles.length > 0 ? row.roles[0] : 'Sin rol'}
+        </span>
+      ),
+    },
+    // 3. Columna de Acciones sin usar alert() nativo
     {
       header: 'Acciones',
       id: 'actions',
       cell: (row) => (
         <div className="text-right">
           <button
-            onClick={() => alert(`Editar usuario ID: ${row.id}`)}
+            onClick={() => console.log('Editar usuario ID:', row.id)}
             className="text-[#0B5B42] font-bold hover:underline text-xs"
           >
             Editar
@@ -45,29 +56,19 @@ const AdminUsersManager = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div className="p-6">
+      <div className="mb-6 flex justify-between items-center">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl">👥</span>
-            <h2 className="text-xl font-bold text-slate-800">Gestión de Usuarios</h2>
-          </div>
-          <p className="text-xs text-slate-500">
-            Administra los roles, accesos y permisos de doctores, tutores y administradores.
-          </p>
+          <h1 className="text-2xl font-bold text-[#004D40]">Gestión de Usuarios</h1>
+          <p className="text-sm text-slate-500">Administra cuentas, roles y accesos a la plataforma.</p>
         </div>
-        <button className="px-4 py-2.5 bg-[#0B5B42] hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
-          <span>+</span> Registrar Nuevo Usuario
-        </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <ServerSideTable
-          endpoint="/api/users"
-          columns={columns}
-          placeholderSearch="Buscar por nombre o correo..."
-        />
-      </div>
+      {/* 1. Endpoint corregido a /users */}
+      <ServerSideTable
+        endpoint="/users"
+        columns={columns}
+      />
     </div>
   );
 };
