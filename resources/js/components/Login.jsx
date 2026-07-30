@@ -166,13 +166,18 @@ const Login = () => {
         </form>
 
         <div className="footer-links">
-          <p>
-            ¿No tienes cuenta?{' '}
-            <button type="button" onClick={() => navigate('/register')}>
-              Regístrate aquí
-            </button>
-          </p>
-        </div>
+  <p>
+    <button type="button" onClick={() => navigate('/forgot-password')}>
+      ¿Olvidaste tu contraseña?
+    </button>
+  </p>
+  <p>
+    ¿No tienes cuenta?{' '}
+    <button type="button" onClick={() => navigate('/register')}>
+      Regístrate aquí
+    </button>
+  </p>
+</div>
       </div>
     </div>
   );

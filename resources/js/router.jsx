@@ -1,4 +1,6 @@
 import React from 'react';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts y Guardián
@@ -49,6 +51,10 @@ const AppRouter = () => {
         {/* RUTAS PÚBLICAS */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* RUTAS PROTEGIDAS CON MAINLAYOUT */}
         <Route element={<MainLayout />}>
