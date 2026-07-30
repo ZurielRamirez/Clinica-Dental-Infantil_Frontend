@@ -6,7 +6,8 @@ import '../../css/auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ role: 'tutor', email: '', password: '' });
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,13 +52,13 @@ const Login = () => {
         password: formData.password
       });
 
-      // 2. Extraemos access_token y el objeto user devueltos por Zuriel
+      // 2. Extraemos access_token y el objeto user
       const { access_token, user } = response.data;
 
-      // 3. Obtenemos el nombre del rol desde el arreglo 'roles' de Zuriel
-      const roleFromBackend = user?.roles?.[0]?.name || formData.role;
+      // 3. Obtenemos el nombre del rol desde el backend
+      const roleFromBackend = user?.roles?.[0]?.name || user?.role?.name || user?.role || 'tutor';
 
-      // Mapeamos 'dentist' a 'doctor' para tus rutas en React si es necesario
+      // Mapeamos 'dentist' a 'doctor' para React
       const normalizedRole = roleFromBackend === 'dentist' ? 'doctor' : roleFromBackend;
 
       // 4. Guardamos un objeto user estructurado en el LocalStorage
@@ -71,7 +72,7 @@ const Login = () => {
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(userToSave));
 
-      // 5. Redireccionamos al Dashboard según el rol
+      // 5. Redireccionamos al Dashboard según el rol devuelto por la BD
       if (normalizedRole === 'admin') {
         navigate('/admin/dashboard');
       } else if (normalizedRole === 'doctor' || roleFromBackend === 'dentist') {
@@ -99,40 +100,64 @@ const Login = () => {
         {generalError && <div className="alert-general">{generalError}</div>}
 
         <form onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
-            <label className="form-label">Perfil de Usuario</label>
-            <select name="role" className="form-select" value={formData.role} onChange={handleChange}>
-              <option value="tutor">Padre de Familia / Tutor</option>
-              <option value="doctor">Odontopediatra / Especialista</option>
-              <option value="admin">Administrador / Recepción</option>
-            </select>
-          </div>
-
+          
+          {/* Correo Electrónico */}
           <div className="form-group">
             <label className="form-label">Correo Electrónico</label>
             <input
               type="email"
               name="email"
               className={`form-input ${errors.email ? 'input-error' : ''}`}
-              placeholder="usuario@kiddiedent.com"
+              placeholder="usuario@admin.com"
               value={formData.email}
               onChange={handleChange}
             />
-            {errors.email && <span className="error-msg">{Array.isArray(errors.email) ? errors.email[0] : errors.email}</span>}
+            {errors.email && (
+              <span className="error-msg">
+                {Array.isArray(errors.email) ? errors.email[0] : errors.email}
+              </span>
+            )}
           </div>
 
+          {/* Contraseña con ojito toggle */}
           <div className="form-group">
             <label className="form-label">Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              className={`form-input ${errors.password ? 'input-error' : ''}`}
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <span className="hint-text">Mínimo 8 caracteres, 1 mayúscula, 1 número y 1 carácter especial.</span>
-            {errors.password && <span className="error-msg">{Array.isArray(errors.password) ? errors.password[0] : errors.password}</span>}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                className={`form-input ${errors.password ? 'input-error' : ''}`}
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                style={{ paddingRight: '2.5rem', width: '100%' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '1.2rem',
+                  color: '#666',
+                  padding: '0 5px'
+                }}
+                title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
+            <span className="hint-text">
+              Mínimo 8 caracteres, 1 mayúscula, 1 número y 1 carácter especial.
+            </span>
+            {errors.password && (
+              <span className="error-msg">
+                {Array.isArray(errors.password) ? errors.password[0] : errors.password}
+              </span>
+            )}
           </div>
 
           <button type="submit" disabled={loading} className="btn-primary">
@@ -141,7 +166,12 @@ const Login = () => {
         </form>
 
         <div className="footer-links">
-          <p>¿No tienes cuenta? <button onClick={() => navigate('/register')}>Regístrate aquí</button></p>
+          <p>
+            ¿No tienes cuenta?{' '}
+            <button type="button" onClick={() => navigate('/register')}>
+              Regístrate aquí
+            </button>
+          </p>
         </div>
       </div>
     </div>
