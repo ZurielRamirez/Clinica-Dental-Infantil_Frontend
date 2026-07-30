@@ -6,9 +6,12 @@ import '../../css/auth.css';
 
 const Register = () => {
   const navigate = useNavigate();
+  
+  // 1. Estado actualizado con el campo 'phone'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     password_confirmation: ''
   });
@@ -24,6 +27,7 @@ const Register = () => {
     if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: '' });
   };
 
+  // 2. Validación de cliente mejorada (Phone + Reglas de Password del Backend)
   const validate = () => {
     const newErrors = {};
 
@@ -37,10 +41,26 @@ const Register = () => {
       newErrors.email = 'El formato del correo no es válido.';
     }
 
+    // Validación de Teléfono
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'El teléfono es requerido.';
+    } else if (!/^\+?[0-9]{10,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+      newErrors.phone = 'Ingresa un teléfono válido, ej. +5219511234567.';
+    }
+
+    // Validación estricta de Contraseña
     if (!formData.password) {
       newErrors.password = 'La contraseña es requerida.';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+    } else {
+      if (formData.password.length < 8) {
+        newErrors.password = 'Mínimo 8 caracteres.';
+      } else if (!/[A-Z]/.test(formData.password)) {
+        newErrors.password = 'Debe incluir al menos una mayúscula.';
+      } else if (!/[0-9]/.test(formData.password)) {
+        newErrors.password = 'Debe incluir al menos un número.';
+      } else if (!/[^A-Za-z0-9]/.test(formData.password)) {
+        newErrors.password = 'Debe incluir al menos un carácter especial.';
+      }
     }
 
     if (!formData.password_confirmation) {
@@ -65,32 +85,24 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // Forzamos internamente que el registro público asignador sea 'tutor'
+      // 3. Payload ajustado a los campos exactos que espera el Backend
       const payload = {
         name: formData.name,
         email: formData.email,
+        phone: formData.phone,
         password: formData.password,
         password_confirmation: formData.password_confirmation,
-        role: 'tutor'
       };
 
       const response = await api.post('/register', payload);
 
-      // Si el backend retorna token e inicio de sesión automático:
       if (response.data.access_token) {
         const { access_token, user } = response.data;
-        const userToSave = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: 'tutor'
-        };
-
+        
         localStorage.setItem('token', access_token);
-        localStorage.setItem('user', JSON.stringify(userToSave));
+        localStorage.setItem('user', JSON.stringify(user));
         navigate('/tutor/dashboard');
       } else {
-        // Si requiere ir a login primero
         navigate('/login');
       }
 
@@ -98,7 +110,9 @@ const Register = () => {
       if (err.response && err.response.status === 422) {
         setErrors(err.response.data.errors || {});
       } else {
-        setGeneralError(err.response?.data?.message || 'Error al registrar la cuenta. Inténtalo nuevamente.');
+        setGeneralError(
+          err.response?.data?.message || 'Error al registrar la cuenta. Inténtalo nuevamente.'
+        );
       }
     } finally {
       setLoading(false);
@@ -139,13 +153,31 @@ const Register = () => {
               type="email"
               name="email"
               className={`form-input ${errors.email ? 'input-error' : ''}`}
-              placeholder="usuario@tutor.com"
+              placeholder="usuario@kiddiedent.com"
               value={formData.email}
               onChange={handleChange}
             />
             {errors.email && (
               <span className="error-msg">
                 {Array.isArray(errors.email) ? errors.email[0] : errors.email}
+              </span>
+            )}
+          </div>
+
+          {/* 4. Campo de Teléfono agregando la clase de formulario */}
+          <div className="form-group">
+            <label className="form-label">Teléfono</label>
+            <input
+              type="tel"
+              name="phone"
+              className={`form-input ${errors.phone ? 'input-error' : ''}`}
+              placeholder="+5219511234567"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+            {errors.phone && (
+              <span className="error-msg">
+                {Array.isArray(errors.phone) ? errors.phone[0] : errors.phone}
               </span>
             )}
           </div>
